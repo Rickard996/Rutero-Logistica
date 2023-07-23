@@ -1,0 +1,117 @@
+#map {
+    width: 600px;
+    height: 800px;
+    /*
+    position: relative; 
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 3%;
+    top: -50%;
+    transform: translateY(50%);
+    transform: translateY(50%); */
+}
+
+h1 {
+    position: relative;
+    text-align: center;
+}
+
+.container {
+  border: 3px solid #fff;
+  padding: 20px;
+}
+
+.excel_container {
+  width: 50%;
+  float: left;
+  padding: 30px;
+}
+
+.map_container {
+  width: 50%;
+  float: left;
+  padding: 20px;
+}
+
+#myDemoTextArea {
+    width: 100%;
+    height: 100px;
+  }
+  
+  #table_container {
+    width: 100%;
+    max-height: 500px;
+    overflow-y: scroll;
+    padding: 5px;
+  }
+  
+  #tableAsJSON {
+    width: 300px;
+    height: 500px;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    box-sizing: border-box;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact thead th {
+    font-size: 1rem;
+    line-height: 1.5;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    text-align: inherit;
+    padding: 0.3rem;
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    color: #fff;
+    background-color: #212529;
+    border-color: #32383e;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact td {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    padding: 0.3rem;
+    vertical-align: top;
+    box-shadow: 0 0 1px #212529;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact
+    tbody
+    tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact th:first-of-type {
+    border-top-left-radius: 10px;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact th:last-of-type {
+    border-top-right-radius: 10px;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact
+    tr:last-of-type
+    td:first-of-type {
+    border-bottom-left-radius: 10px;
+  }
+  
+  table.boostrap4_table_head_dark_striped_rounded_compact
+    tr:last-of-type
+    td:last-of-type {
+    border-bottom-right-radius: 10px;
+  }
