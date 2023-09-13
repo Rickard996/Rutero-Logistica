@@ -43,6 +43,8 @@ let constructJSONFromPastedInput = (pastedInput) => {
 };
 */
 
+const arrayRestantes = []
+
 let constructTableFromPastedInput = (pastedInput) => {
   let rawRows = pastedInput.split("\n");
   let headRow = "";
@@ -113,6 +115,8 @@ document.getElementById("clear_link").addEventListener("click", () => {
 
 // Initialize the map.
 let map;
+//Initialize the Promise
+let firstPromise;
 
 async function initMap() {
 
@@ -169,20 +173,21 @@ async function initMap() {
   function geocodePlaceId(geocoder, map) {
     const address = document.getElementById("tableAsJSON").value;
     let addressArray = JSON.parse(address)
+    let indexExactos = 0;   //indice de direcciones exactas para el geocoder
     const arrayAddresses = [];
     addressArray.forEach(element=>{
         arrayAddresses.push(element)
     })
     arrayAddresses.pop();  //delete last element(empty element)
 
-    //console.log(arrayAddresses[0])
-
     //for each address execute some code
     arrayAddresses.forEach((element, index)=>{
       geocoder
       .geocode({ address: element.Direccion })
       .then(({ results }) => {
-        if (results[0] && !results[0].partial_match) {   //si hay un resultado y si ademas ese resultado no es parcial, es decir es exacto, then..
+        //&&!results[0].partial_match   no es partial match
+
+        if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
           map.setZoom(11);
           map.setCenter(results[0].geometry.location);
   
@@ -205,17 +210,212 @@ async function initMap() {
           marker.addListener("click", ()=>{
             infoWindoww.open(map, marker)
           })
+          //incrementa index
+          indexExactos = indexExactos + 1
+          console.log("Valor exacto!")
+        }
+        // si hay un resultado parcial y ese resultado parcial ademas es "Valdivia, Los Ríos, Chile"
+        // && results[0].formatted_address === "Valdivia, Los Ríos, Chile"
+        else if(results[0].partial_match || !results[0]){   //si no existe results[0] tambien pasa aca. evito el error a toda costa
+          //alert("Partial match")
+          //window.alert("Hay un resultado parcial para " + element.Direccion + " y es: " + results[0].formatted_address)
+          let dirRectificada = null;
+          while (dirRectificada == null){
+            dirRectificada = window.prompt("Ha ocurrido un error, favor rectificar la direccion "+element.Direccion+":");
+          }
+          arrayRestantes.push({Direccion: dirRectificada, KG: element.KG, indice: (index + 1)});
 
-        } else {
+        }  //End if
+        /*
+        // si hay un resultado parcial y ese resultado parcial NO ES "Valdivia, Los Ríos, Chile"
+        else if(results[0].partial_match && results[0].formatted_address !== "Valdivia, Los Ríos, Chile"){
+          alert("Deberia ir sin problemas")
+          map.setZoom(11);
+          map.setCenter(results[0].geometry.location);
+  
+          var marker = new google.maps.Marker({
+            map,
+            position: results[0].geometry.location,
+            label: {
+              color: 'black',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              text: String(index+1),
+            },
+          });
+  
+          var infoWindoww = new google.maps.InfoWindow({
+            content: '<h1>'+String(index+1)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
+          })
+          //infowindow.setContent(results[0].formatted_address);
+          //infowindow.open(map, marker);   dont want to open it now
+          marker.addListener("click", ()=>{
+            infoWindoww.open(map, marker)
+          })
+        }  //End if
+        */
+
+        //Si no encuentra resultados
+        else {
           window.alert("No encontre resultados para: "+element.Direccion+", favor especifique mejor la direccion");
         }
-      })
-      .catch((e) => window.alert("Geocoder failed due to: " + e));
-    })
 
+        //PROMESA. Se hace de todas formas despues de estos if
+        //console.log(arrayRestantes.length)
+        //console.log(indexExactos)
+
+        firstPromise = new Promise((resolve, reject) =>{
+          if (arrayRestantes.length + indexExactos == arrayAddresses.length){
+              //console.log("Se cumple promesa una unica vez!!!")
+              resolve(arrayRestantes)      //le paso el arrayRestantes para ser utilizado
+          }else{
+              reject('Failed')
+          }
+      })
+      
+      //esta promesa se cumple una unica vez. array es el array de elementos restantes que fueron rectificados por el user
+      firstPromise.then((array)=>{
+        console.log("Se cumplio la promesa!!!!")
+        console.log(array)
+        //console.log(array['0'])
+        //just use element, dont need index
+        array.forEach((element)=>{
+          //print element
+          console.log(element)
+          //ejecuta geocoder o geocoder2 para cada element 
+          geocoder
+          .geocode({ address: element.Direccion })
+          .then(({ results }) => {
+            if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
+              map.setZoom(11);
+              map.setCenter(results[0].geometry.location);
+      
+              var marker = new google.maps.Marker({
+                map,
+                position: results[0].geometry.location,
+                label: {
+                  color: 'black',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  text: String(element.indice),
+                },
+              });
+      
+              var infoWindoww = new google.maps.InfoWindow({
+                content: '<h1>'+String(element.indice)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
+              })
+              //infowindow.setContent(results[0].formatted_address);
+              //infowindow.open(map, marker);   dont want to open it now
+              marker.addListener("click", ()=>{
+                infoWindoww.open(map, marker)
+              })
+              console.log("Valor rectificado!!")
+            }
+          })
+        })
+      })
+      
+
+      })
+      //catch errors
+      .catch((e) => window.alert(element.Direccion +" Tuvo error, "+ "Geocoder failed due to: " + e));
+
+    })
     /*
   */
   }
-  
+
+function geocodePlaceRestantes(geocoder, map){
+  arrayRestantes.forEach((element, index)=>{
+    geocoder
+    .geocode({ address: element.Direccion })
+    .then(({ results }) => {
+      //&&!results[0].partial_match   no es partial match
+      if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
+        map.setZoom(11);
+        map.setCenter(results[0].geometry.location);
+
+        var marker = new google.maps.Marker({
+          map,
+          position: results[0].geometry.location,
+          label: {
+            color: 'black',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            text: String(index+1),
+          },
+        });
+
+        var infoWindoww = new google.maps.InfoWindow({
+          content: '<h1>'+String(element.indice)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
+        })
+        //infowindow.setContent(results[0].formatted_address);
+        //infowindow.open(map, marker);   dont want to open it now
+        marker.addListener("click", ()=>{
+          infoWindoww.open(map, marker)
+        })
+      }
+      //Si no encuentra resultados
+      else {
+        window.alert("No encontre resultados para: "+element.Direccion+", favor especifique mejor la direccion");
+      }
+    })  //catch errors
+    .catch((e) => window.alert("Geocoder failed due to: " + e));
+
+    })
+
+}
+
   initMap();
-  
+
+//esta promesa se cumple una unica vez. array es el array de elementos restantes que fueron rectificados por el user
+
+
+
+/* PROMESA
+
+      firstPromise.then((array)=>{
+        console.log("Se cumplio la promesa!!!!")
+        console.log(array)
+        //console.log(array['0'])
+        //just use element, dont need index
+        array.forEach((element)=>{
+          //print element
+          console.log(element)
+          //ejecuta geocoder o geocoder2 para cada element 
+          geocoder
+          .geocode({ address: element.Direccion })
+          .then(({ results }) => {
+            if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
+              map.setZoom(11);
+              map.setCenter(results[0].geometry.location);
+      
+              var marker = new google.maps.Marker({
+                map,
+                position: results[0].geometry.location,
+                label: {
+                  color: 'black',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  text: String(element.indice),
+                },
+              });
+      
+              var infoWindoww = new google.maps.InfoWindow({
+                content: '<h1>'+String(element.indice)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
+              })
+              //infowindow.setContent(results[0].formatted_address);
+              //infowindow.open(map, marker);   dont want to open it now
+              marker.addListener("click", ()=>{
+                infoWindoww.open(map, marker)
+              })
+              console.log("Valor rectificado!!")
+            }
+          })
+        })
+      })
+
+*/
+
+
+

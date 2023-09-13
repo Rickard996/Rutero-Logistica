@@ -24,7 +24,7 @@ h1 {
 .excel_container {
   width: 50%;
   float: left;
-  padding: 30px;
+  padding: 15px;
 }
 
 .map_container {
@@ -34,7 +34,7 @@ h1 {
 }
 
 #myDemoTextArea {
-    width: 100%;
+    width: 75%;
     height: 100px;
   }
   
