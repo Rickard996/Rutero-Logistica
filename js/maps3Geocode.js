@@ -43,7 +43,10 @@ let constructJSONFromPastedInput = (pastedInput) => {
 };
 */
 
-const arrayRestantes = []
+//array de elementos con direccion parcial, que hay que modificar
+const arrayRestantes = [];
+//array de direcciones
+const arrayAddresses = [];
 
 let constructTableFromPastedInput = (pastedInput) => {
   let rawRows = pastedInput.split("\n");
@@ -85,8 +88,6 @@ let constructJSONFromPastedInput = (pastedInput) => {
   });
   return output;
 };
-
-
 
 const theTextArea = document.getElementById("myDemoTextArea");
 
@@ -140,7 +141,7 @@ async function initMap() {
     })
 
     document.getElementById("submitFinal").addEventListener("click", ()=>{
-        geocodePlaceall(geocoder, map)
+        geocodePlaceAll(geocoder, map)
     })
 
   }
@@ -176,11 +177,27 @@ async function initMap() {
     const address = document.getElementById("tableAsJSON").value;
     let addressArray = JSON.parse(address)
     let indexExactos = 0;   //indice de direcciones exactas para el geocoder
-    const arrayAddresses = [];
+    //este array ya existe
     addressArray.forEach(element=>{
+        //modifica el elemento en su propiedad Direccion, añadiendo ,Valdivia
+        element.Direccion = element.Direccion + ", Valdivia"
+        //ahora si añade el element al array
         arrayAddresses.push(element)
     })
     arrayAddresses.pop();  //delete last element(empty element)
+
+    console.log("Largo antes de quitar duplicados: "+arrayAddresses.length)
+
+    //Eliminar duplicados
+    console.log("Eliminando duplicados")
+    let newArrayAddresses = arrayAddresses.filter((value, index, self) =>
+    index === self.findIndex((t) => (
+        //t.Cliente === value.Cliente && 
+      t.Direccion === value.Direccion
+    ))
+  )
+    console.log("Largo despues de quitar duplicados: "+arrayAddresses.length)
+    console.log(newArrayAddresses)
 
     //for each address execute some code
     arrayAddresses.forEach((element, index)=>{
@@ -189,114 +206,47 @@ async function initMap() {
       .then(({ results }) => {
         //&&!results[0].partial_match   no es partial match
 
-        if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
-          map.setZoom(11);
-          map.setCenter(results[0].geometry.location);
-  
-          var marker = new google.maps.Marker({
-            map,
-            position: results[0].geometry.location,
-            label: {
-              color: 'black',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              text: String(index+1),
-            },
-          });
-  
-          var infoWindoww = new google.maps.InfoWindow({
-            content: '<h1>'+String(index+1)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
-          })
-          //infowindow.setContent(results[0].formatted_address);
-          //infowindow.open(map, marker);   dont want to open it now
-          marker.addListener("click", ()=>{
-            infoWindoww.open(map, marker)
-          })
-          //incrementa index
-          indexExactos = indexExactos + 1
-          console.log("Valor exacto!")
+        if (results[0] && !(results[0].partial_match)) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
+          console.log("La Direccion " + element.Direccion + " tiene una direccion exacta")
+          //print console y no hacer nada
         }
         // si hay un resultado parcial y ese resultado parcial ademas es "Valdivia, Los Ríos, Chile"
         // && results[0].formatted_address === "Valdivia, Los Ríos, Chile"
-        else if(results[0].partial_match || !results[0]){   //si no existe results[0] tambien pasa aca. evito el error a toda costa
-          //alert("Partial match")
-          //window.alert("Hay un resultado parcial para " + element.Direccion + " y es: " + results[0].formatted_address)
+        else if(results[0].partial_match){
+        console.log("La Direccion " + element.Direccion + " tiene una direccion parcial")
           let dirRectificada = null;
           while (dirRectificada == null){
             dirRectificada = window.prompt("Ha ocurrido un error, favor rectificar la direccion "+element.Direccion+":");
           }
-          arrayRestantes.push({Direccion: dirRectificada, KG: element.KG, indice: (index + 1)});
+          arrayAddresses[index].Direccion = dirRectificada
+        }  //End if
 
+        else if(!results[0]){   //si no existe results[0] tambien pasa aca. evito el error a toda costa
+            console.log("La Direccion " + element.Direccion + " tiene una direccion parcial")
+              let dirRectificada = null;
+              while (dirRectificada == null){
+                dirRectificada = window.prompt("Ha ocurrido un error, favor rectificar la direccion "+element.Direccion+":");
+              }
+              arrayAddresses[index].Direccion = dirRectificada
         }  //End if
 
         //Si no encuentra resultados
         else {
-          window.alert("No encontre resultados para: "+element.Direccion+", favor especifique mejor la direccion");
-        }
-
-        //PROMESA. Se hace de todas formas despues de estos if
-        //console.log(arrayRestantes.length)
-        //console.log(indexExactos)
-        firstPromise = new Promise((resolve, reject) =>{
-          if (arrayRestantes.length + indexExactos == arrayAddresses.length){
-              //console.log("Se cumple promesa una unica vez!!!")
-              resolve(arrayRestantes)      //le paso el arrayRestantes para ser utilizado
-          }else{
-              reject('Failed')
-          }
-      })
-      
-      //esta promesa se cumple una unica vez. array es el array de elementos restantes que fueron rectificados por el user
-      firstPromise.then((array)=>{
-        console.log("Se cumplio la promesa!!!!")
-        console.log(array)
-        //console.log(array['0'])
-        //just use element, dont need index
-        array.forEach((element)=>{
-          //print element
-          console.log(element)
-          //ejecuta geocoder o geocoder2 para cada element 
-          geocoder
-          .geocode({ address: element.Direccion })
-          .then(({ results }) => {
-            if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
-              map.setZoom(11);
-              map.setCenter(results[0].geometry.location);
-      
-              var marker = new google.maps.Marker({
-                map,
-                position: results[0].geometry.location,
-                label: {
-                  color: 'black',
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  text: String(element.indice),
-                },
-              });
-      
-              var infoWindoww = new google.maps.InfoWindow({
-                content: '<h1>'+String(element.indice)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
-              })
-              //infowindow.setContent(results[0].formatted_address);
-              //infowindow.open(map, marker);   dont want to open it now
-              marker.addListener("click", ()=>{
-                infoWindoww.open(map, marker)
-              })
-              console.log("Valor rectificado!!")
+            console.log("La Direccion " + element.Direccion + " no tiene resultados")
+            let dirRectificada = null;
+            while (dirRectificada == null){
+              dirRectificada = window.prompt("Ha ocurrido un error, favor rectificar la direccion "+element.Direccion+":");
             }
-          })
-        })
-      })
+            arrayAddresses[index].Direccion = dirRectificada
+        }
       })
       //catch errors
       .catch((e) => window.alert(element.Direccion +" Tuvo error, "+ "Geocoder failed due to: " + e));
-
     })
-    /*
-  */
-  }
 
-function geocodePlaceRestantes(geocoder, map){
+  }
+  /*
+function geocodePlaceAll(geocoder, map){
   arrayRestantes.forEach((element, index)=>{
     geocoder
     .geocode({ address: element.Direccion })
@@ -336,10 +286,57 @@ function geocodePlaceRestantes(geocoder, map){
     })
 
 }
+  */
+
+//Posiciona los marcadores de todas las ubicaciones.
+//Se supone que todas las direcciones son exactas, pues se rectificaron
+function geocodePlaceAll(geocoder, map){
+    arrayAddresses.forEach((element, index)=>{
+        //console.log(element)
+        geocoder
+        .geocode({ address: element.Direccion })
+        .then(({ results }) => {
+          //&&!results[0].partial_match   no es partial match
+          if (results[0] &&!results[0].partial_match) {   //si hay un resultado y si ademas ese resultado NO es parcial(Es exacto), es decir es exacto, then..
+            map.setZoom(11);
+            map.setCenter(results[0].geometry.location);
+    
+            var marker = new google.maps.Marker({
+              map,
+              position: results[0].geometry.location,
+              label: {
+                color: 'black',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                text: String(index+1),
+              },
+            });
+    
+            var infoWindoww = new google.maps.InfoWindow({
+              content: '<h1>'+String(element.indice)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
+            })
+            //infowindow.setContent(results[0].formatted_address);
+            //infowindow.open(map, marker);   dont want to open it now
+            marker.addListener("click", ()=>{
+              infoWindoww.open(map, marker)
+            })
+          }
+          //Si no encuentra resultados
+          else {
+            window.alert("No encontre resultados para: "+element.Direccion+", favor especifique mejor la direccion");
+          }
+        })  //catch errors
+        .catch((e) => window.alert("Geocoder failed due to: " + e));
+      })
+}
+
+
+
+
+
+
+
 
   initMap();
 
 //esta promesa se cumple una unica vez. array es el array de elementos restantes que fueron rectificados por el user
-
-
-
