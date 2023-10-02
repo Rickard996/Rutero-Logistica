@@ -1,0 +1,19 @@
+1.- Terminar de hacer macro para crear dinamicas (Vara y Caja)
+Cambiar nombre de field de TIPO DE DESPACHO ---> DESPACHO(CAJA/VARA)
+
+2.- Cambiar botones, de manera que el rectificar solo guarde la posicion del array que falta rectificar (no pida rectificar en el momento). 
+Quizá un boolean para hacer esto. 
+
+2.1.- Crear nuevo boton que si sea rectificar posicion, no usando ahora el geocoder, sino object previamente creado
+
+3.- Hacer markers de distinto color, dependiendo de si son vara-caja, supermercado, etc
+
+4.- Hacer markers clickeables, ir añadiendo detalle a tabla creada por js en navegador
+
+
+
+
+
+
+*.- Avanzar en revisar codigo calculo de stock
+

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./mapStyle.css">
     <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
 </head>
 <body>
     <h1>Rutero logistica</h1>
@@ -23,9 +24,21 @@
           <a href="#" id="clear_link">Clear</a>
         </div>
         <div id="table_container"></div>
-        <textarea id="tableAsJSON"></textarea>
-        <button type="submit" id="submit">Rectificar Direcciones</button>
-        <button type="submit" id="submitFinal">Posicionar en mapa</button>
+        <textarea id="tableAsJSON" hidden></textarea>
+        <button type="submit" id="validate">Validar Direcciones</button>
+        <button type="submit" id="rectify">Rectificar Direcciones</button>
+        <button type="submit" id="searchFinal">Posicionar en mapa</button>
+
+        <!-- Table of data-->
+        <table id="myTable" class="table table-borderless table-striped table-earning">
+          <thead>
+            <tr>
+              <th>date</th>
+              <th>file name</th>
+            </tr>
+          </thead>
+          <tbody id="testBody"></tbody>
+        </table>
 
       </div>
     </div>
