@@ -8,12 +8,17 @@ Quizá un boolean para hacer esto.
 
 3.- Hacer markers de distinto color, dependiendo de si son vara-caja, supermercado, etc
 
+
+03-10-23
 4.- Hacer markers clickeables, ir añadiendo detalle a tabla creada por js en navegador
 
+5.- Hacer boton para asignar nro ruta a elementos seleccionados
 
+6.- Que lo anterior funcione para multiples asignaciones de nro ruta
 
+7.- Boton para exportar rutas asignadas
 
-
+8.- Macro para hacer cruce entre direcciones-cliente-vara/caja - nro ruta con las nota venta en la planilla IMPRIMIR
 
 *.- Avanzar en revisar codigo calculo de stock
 

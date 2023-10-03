@@ -46,7 +46,9 @@ let constructJSONFromPastedInput = (pastedInput) => {
 //array de elementos con direccion parcial, que hay que modificar
 const arrayRestantes = [];
 //array de direcciones
-let arrayAddresses = [];
+let arrayAddresses = new Array();
+//clone of arrayAddresses
+let clonedArray = [];
 
 //This is the data currently appended to the table
 let dataCurrentTable = [];
@@ -134,7 +136,8 @@ async function initMap() {
       geocodePlaceId(geocoder, map, infowindow);
     });
     */
-
+    //Listeners
+    //geocoder populates array of inexact
     document.getElementById("validate").addEventListener("click", ()=> {
       //call geocodePlaceId and save the array in a variable
       geocodePlaceId(geocoder, map);
@@ -144,14 +147,24 @@ async function initMap() {
       //redefineInexactAddresses(arrayAddresses)
 
     })
-
+    //user rectifica direcciones mal ingresadas (no exactas)
     document.getElementById("rectify").addEventListener("click", ()=> {
       //I am using arrayAddresses, which is a global variable 
       redefineInexactAddresses();
     })
-
+    //Geolocalizacion de puntos en el mapa
     document.getElementById("searchFinal").addEventListener("click", ()=>{
         geocodePlaceAll(geocoder, map);
+    })
+    //Asignacion de ruta
+    document.getElementById("assign").addEventListener("click", ()=>{
+      //asigna una nueva ruta a los elementos añadidos al array de objetos seleccionados por el user
+      assignNewRuta();
+    })
+    //Exporta rutas
+    document.getElementById("export").addEventListener("click", ()=>{
+      //Exporta el array completo de direcciones con sus rutas ya asignadas por el usuario
+      exportArray();
     })
 
   }
@@ -178,9 +191,22 @@ async function initMap() {
         arrayAddresses.push(element)
     })
     arrayAddresses.pop();  //delete last element(empty element)
+    //alert the user the number of addresses
+    alert("Se registraron "+arrayAddresses.length+" direcciones (puntos de entrega)");
 
-    //console.log("Luego de añadir isExact")
-    console.log(arrayAddresses)
+    //create a copy(clone) of arrayAddresses and then modify this copy to later export it
+    //method slice to clone the array
+    //clone the array only if it exists(is defined), but is empty yet. BUT I NEED THE COPY OF THE OLD ARRAY WITH ADDRESSES WITHOUT MODIFY
+    if (typeof clonedArray !== 'undefined' && clonedArray.length == 0) {
+      // the array is defined and has zero elements
+      //arrayAddresses is of type Array. therefore i can use structuredClone() to clone the array
+      clonedArray = structuredClone(arrayAddresses);
+      console.log("Aca estoy clonando arrayAddresses!");
+      console.log(clonedArray);
+    }
+
+    console.log("raw array cloned!");
+    console.log(arrayAddresses);
 
     //Eliminar duplicados
     /*
@@ -240,11 +266,21 @@ async function initMap() {
   }
   //POPULATE TABLE WITH AN ARRAY CALLED result
   function populateOverallOverview(currentMarker){
-
+    //currentMarker is the current array of objects with all the elements the user wants to assign
     console.log("Limpiando tabla")
+    //jquery clear table rows
     $("#testBody").empty();
+    //get the sum of the columns
+    let sumKG = 0;
+    currentMarker.forEach(el =>{
+      sumKG = sumKG + parseFloat(el.KG);
+    })
+    //push the grand total element to array (temporal) to see the row in table
+    //HAS ONLY KG attribute
+    currentMarker.push({CLIENTE:"Total", Direccion:"-", DESPACHO:"-", KG: sumKG})
 
     function loadTableData(items) {
+      //get the table
       const table = document.getElementById("testBody");
       //clear current table
       //table.innerHTML = "";
@@ -252,14 +288,19 @@ async function initMap() {
       //clear table body before
       
       items.forEach( item => {
-        let row = table.insertRow();
-        let cliente = row.insertCell(0);
+        let row = table.insertRow();   //insert arow of data with values
+        let cliente = row.insertCell(0);   //column 0
         cliente.innerHTML = item.CLIENTE;
-        let direccion = row.insertCell(1);
+        let direccion = row.insertCell(1); //column 1
         direccion.innerHTML = item.Direccion;
+        let formatoEntrega = row.insertCell(2); //column 2
+        formatoEntrega.innerHTML = item.DESPACHO;
+        let totalKG = row.insertCell(3); //column 3
+        totalKG.innerHTML = item.KG;
       });
     }
     loadTableData(currentMarker);
+    currentMarker.pop()  //delete last item which is grand total. (i dont want it here) 
     //loadTableData(items2);
     loadTableData([]);
     
@@ -357,15 +398,70 @@ function geocodePlaceAll(geocoder, map){
 function addInfoToTable(element){
     console.log("Getting element from a marker!")
     console.log(element)
-    console.log("Pushing element to array")
-    //push to some array
-    dataCurrentTable.push(element)
-    populateOverallOverview(dataCurrentTable)
+    
+    //only push to array if not in the current array of objects. Use containsObject function
+    if(!containsObject(element, dataCurrentTable)){
+      console.log("Pushing element to array");
+      dataCurrentTable.push(element);
+    }else{
+      alert("Punto ya incluido en la ruta");
+    }
+    //populate the table of objects
+    populateOverallOverview(dataCurrentTable);
 }
 
 function clearRowFromTable(someArray, element){
     var filtered = someArray.filter(function(element) { return element.Name != "Kristian"; }); 
 }
+
+//To see if an object is in array of objects
+function containsObject(obj, list) {
+  var i;
+  for (i = 0; i < list.length; i++) {
+      if (list[i] === obj) {
+          return true;
+      }
+  }
+  return false;
+}
+
+//funcion para que el user le asigne el numero de ruta a cada direccion
+function assignNewRuta(){
+  //dataCurrentTable is a global variable, containing what the user is selecting to assign curerntly
+  //arrayAddresses is also a global variable, and contains all the data at this point already rectified
+  let nroRuta = parseInt(window.prompt("Asigne numero de ruta"), 10);
+  //console.log(nroRuta);
+  if(Number.isInteger(nroRuta)){    //if is an integer number then assign la ruta
+    //At this point I have the clonedArray with all the old addresses
+    console.log("Aca estoy leyendo!");
+    console.log(clonedArray);
+    alert("Puntos asignados correctamente");
+  }else{
+    alert("Ingrese un numero valido");
+  }
+}
+
+//Example, find array and do something
+
+function assignCloned(assignedElement){
+  let arr = [
+    { name:"string 1", value:"this", other: "that" },
+    { name:"string 2", value:"this", other: "that" }
+  ];
+
+  let obj = arr.find((element, index) => {
+    if (element.CLIENTE === assignedElement.CLIENTE && element.Direccion === 'string 1' && element.DESPACHO === 'string 1' && element.KG === 'string 1') {     //
+  
+        //arr[i] = { name: 'new string', value: 'this', other: 'that' };
+        return true; // stop searching
+    }
+  });
+
+}
+
+
+
+
 
 
 
