@@ -43,12 +43,16 @@ let constructJSONFromPastedInput = (pastedInput) => {
 };
 */
 
+
 //array de elementos con direccion parcial, que hay que modificar
 const arrayRestantes = [];
 //array de direcciones
 let arrayAddresses = new Array();
 //clone of arrayAddresses
 let clonedArray = [];
+//array of markers displayed in map
+let arrayMarkers = [];
+
 
 //This is the data currently appended to the table
 let dataCurrentTable = [];
@@ -161,6 +165,11 @@ async function initMap() {
       //asigna una nueva ruta a los elementos añadidos al array de objetos seleccionados por el user
       assignNewRuta();
     })
+    //Muestra rutas exportables
+    document.getElementById("show").addEventListener("click", ()=>{
+      //muetra la tabla con los actualmente asignados
+      showArray();
+    })
     //Exporta rutas
     document.getElementById("export").addEventListener("click", ()=>{
       //Exporta el array completo de direcciones con sus rutas ya asignadas por el usuario
@@ -181,12 +190,14 @@ async function initMap() {
     console.log("Antes de añadir isExact")
     console.log(arrayAddresses)
     //este array ya existe
-    addressArray.forEach(element=>{
+    addressArray.forEach((element, ind)=>{
         //modifica el elemento en su propiedad Direccion, añadiendo ,Valdivia
         console.log(element.Direccion)
         element.Direccion = element.Direccion + ", Valdivia"
         //ahora agrega a cada elemento un nuevo feature. By default every element has not exact address for maps
         element.isExact = false
+        //ahora agrega a cada elemento un nuevo feature, que es un id que servira mas adelante
+        element.id = ind;
         //ahora si añade el element al array
         arrayAddresses.push(element)
     })
@@ -341,6 +352,7 @@ function geocodePlaceAll(geocoder, map){
             map.setZoom(11);
             map.setCenter(results[0].geometry.location);
             //set the marker. orange for varas, green for cajas
+            //use element.id to identify later each marker
             if(element.DESPACHO ==="CAJA"){
               var marker = new google.maps.Marker({
                 map,
@@ -348,6 +360,7 @@ function geocodePlaceAll(geocoder, map){
                 //img name
                 
                 icon: '../img/darkgreen_MarkerC.png',
+                id: element.id,
                 /*
                 label: {
                   color: 'black',
@@ -363,6 +376,7 @@ function geocodePlaceAll(geocoder, map){
                 position: results[0].geometry.location,
                 //img name
                 icon: '../img/orange_MarkerV.png',
+                id: element.id,
                 /*
                 label: {
                   color: 'black',
@@ -374,6 +388,9 @@ function geocodePlaceAll(geocoder, map){
               });
             }
 
+            //no matter if CAJA o VARA add the marker to array of markers to use later
+            arrayMarkers.push(marker);
+
             var infoWindoww = new google.maps.InfoWindow({
               content: '<h1>'+String(index+1)+"="+element.Direccion+": "+element.KG+"KG"+'</h1>'
             })
@@ -382,6 +399,7 @@ function geocodePlaceAll(geocoder, map){
             marker.addListener("click", ()=>{
               //infoWindoww.open(map, marker)
               //le paso a mi function todo el element respectivo. Asi tengo toda la info necesaria
+              //console.log(marker);
               addInfoToTable(element);
             })
           }
@@ -410,10 +428,6 @@ function addInfoToTable(element){
     populateOverallOverview(dataCurrentTable);
 }
 
-function clearRowFromTable(someArray, element){
-    var filtered = someArray.filter(function(element) { return element.Name != "Kristian"; }); 
-}
-
 //To see if an object is in array of objects
 function containsObject(obj, list) {
   var i;
@@ -435,29 +449,126 @@ function assignNewRuta(){
     //At this point I have the clonedArray with all the old addresses
     console.log("Aca estoy leyendo!");
     console.log(clonedArray);
-    alert("Puntos asignados correctamente");
+    //Call assignCloned, with a foreach in dataCurrentTable
+    dataCurrentTable.forEach((el, index) =>{
+        console.log("The index of table td is: "+index);
+        console.log("The element of table is: ");
+        console.log(el);
+        assignCloned(el, nroRuta);
+
+      //Clear the markers already assigned
+      //set clickable and visible attributes to false
+      arrayMarkers.forEach((marker, index)=>{
+        if(marker.id == el.id){  //if the ids match
+          marker.setMap(null);
+        }
+      })
+    })
+    //ahora borrar table of assigned and clear the markers of assigned
+    //jquery clear table rows
+    $("#testBody").empty();
+    dataCurrentTable = [];  //clear current table array
+
+    console.log("El array cloned con rutas asignadas actualmente es:")
+    //deberia tener menos elementos que el array completo
+    console.log(clonedArray);
+
+    alert("Puntos de entrega asignados correctamente!");
   }else{
     alert("Ingrese un numero valido");
   }
 }
 
+//Debo llamar la siguiente funcion por cada elemento de tabla a asignar ruta
 //Example, find array and do something
-
-function assignCloned(assignedElement){
-  let arr = [
-    { name:"string 1", value:"this", other: "that" },
-    { name:"string 2", value:"this", other: "that" }
-  ];
-
-  let obj = arr.find((element, index) => {
-    if (element.CLIENTE === assignedElement.CLIENTE && element.Direccion === 'string 1' && element.DESPACHO === 'string 1' && element.KG === 'string 1') {     //
-  
-        //arr[i] = { name: 'new string', value: 'this', other: 'that' };
-        return true; // stop searching
+//In this case, we assign the n° de ruta al respectivo elemento del array
+function assignCloned(assignedElement, nroRuta){
+  //if the elements match(table el vs array el) by its id, then assign the route 
+  clonedArray.forEach((el, index)=>{
+    if(el.id == assignedElement.id){   //si el id esta entre los asignados, entonces le asigna el nro de ruta correspondiente
+      el.assignedRuta = nroRuta;
+      return true;
     }
-  });
-
+  })
+  return false;
 }
+
+//use cloned array which is ready to create a table and be exported
+function exportArray(){
+  //populate the table with the cloned array
+  //create other populate function for this step 
+  //and also use other table
+  populateExportableTable(clonedArray);
+  //export to excel
+  htmlTableToExcel('xlsx');
+}
+
+//function to only show the user the current exportable table 
+function showArray(){
+  //populate the table with the cloned array
+  //create other populate function for this step 
+  //and also use other table
+  populateExportableTable(clonedArray);
+  //show hidden table
+  document.getElementById("tableToExport").hidden = false;
+}
+
+//function to export table to excel workbook
+function htmlTableToExcel(type){   //type .xlsx
+  var data = document.getElementById('tableToExport');
+  var excelFile = XLSX.utils.table_to_book(data, {sheet: "sheet1"});
+  XLSX.write(excelFile, { bookType: type, bookSST: true, type: 'base64' });
+  XLSX.writeFile(excelFile, 'Ruta_Valdivia.' + type);
+ }
+
+//POPULATE TABLE tableToExport (last step)
+function populateExportableTable(clonedArray){
+
+  //currentMarker is the current array of objects with all the elements the user wants to assign
+  console.log("Limpiando tabla")
+  //jquery clear table rows
+  $("#exportBody").empty();
+  //get the sum of the columns
+  let sumKG = 0;
+  clonedArray.forEach(el =>{
+    sumKG = sumKG + parseFloat(el.KG);
+  })
+  //push the grand total element to array (temporal) to see the row in table
+  //HAS ONLY KG attribute
+  clonedArray.push({CLIENTE:"Total", Direccion:"-", DESPACHO:"-", KG: sumKG, assignedRuta: "-"})
+
+  function loadTableData(items) {
+    //get the table
+    const table = document.getElementById("exportBody");
+    //clear current table
+    //table.innerHTML = "";
+    //for each element or item do something
+    //clear table body before
+    
+    items.forEach( item => {
+      let row = table.insertRow();   //insert arow of data with values
+      let grupoRuta = row.insertCell(0);   //column 0
+      grupoRuta.innerHTML = item.assignedRuta;
+      let cliente = row.insertCell(1);   //column 0
+      cliente.innerHTML = item.CLIENTE;
+      let direccion = row.insertCell(2); //column 1
+      direccion.innerHTML = item.Direccion;
+      let formatoEntrega = row.insertCell(3); //column 2
+      formatoEntrega.innerHTML = item.DESPACHO;
+      let totalKG = row.insertCell(4); //column 3
+      totalKG.innerHTML = item.KG;
+    });
+  }
+  loadTableData(clonedArray);
+  clonedArray.pop()  //delete last item which is grand total. (i dont want it here) 
+  //loadTableData(items2);
+  loadTableData([]);
+  
+}
+
+
+
+
 
 
 

@@ -2,7 +2,7 @@
 Cambiar nombre de field de TIPO DE DESPACHO ---> DESPACHO(CAJA/VARA)
 
 2.- Cambiar botones, de manera que el rectificar solo guarde la posicion del array que falta rectificar (no pida rectificar en el momento). 
-Quizá un boolean para hacer esto. 
+Quizá un boolean para hacer esto.
 
 2.1.- Crear nuevo boton que si sea rectificar posicion, no usando ahora el geocoder, sino object previamente creado
 
@@ -21,4 +21,21 @@ Quizá un boolean para hacer esto.
 8.- Macro para hacer cruce entre direcciones-cliente-vara/caja - nro ruta con las nota venta en la planilla IMPRIMIR
 
 *.- Avanzar en revisar codigo calculo de stock
+
+04-10-23
+
+0.- Agregar un id (feature) a cada element para identificarlo mas tarde al momento de asignar la ruta. 	Listo
+
+1.- Permitir remover elementos de tabla
+
+2.- Al asignar nro ruta, que desaparezcan los puntos respectivos del mapa, para no visualizarlos mas. 
+A su vez añadir el numero ruta asignado correspondientea cada elemento. Listo
+
+3.- Boton para exportar rutas asignadas. Listo
+
+8.- Macro para hacer cruce entre direcciones-cliente-vara/caja - nro ruta con las nota venta en la planilla IMPRIMIR
+
+*.- Avanzar en revisar codigo calculo de stock
+
+
 
