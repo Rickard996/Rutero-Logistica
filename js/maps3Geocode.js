@@ -202,8 +202,6 @@ async function initMap() {
         arrayAddresses.push(element)
     })
     arrayAddresses.pop();  //delete last element(empty element)
-    //alert the user the number of addresses
-    alert("Se registraron "+arrayAddresses.length+" direcciones (puntos de entrega)");
 
     //create a copy(clone) of arrayAddresses and then modify this copy to later export it
     //method slice to clone the array
@@ -270,7 +268,10 @@ async function initMap() {
       .catch((e) => window.alert(element.Direccion +" Tuvo error, "+ "Geocoder failed due to: " + e));
     })
     //return the array object
-    alert("Las Direcciones se han validado, ahora rectifique las inexactas")
+
+    //alert the user the number of addresses
+    alert("Se registraron "+arrayAddresses.length+" direcciones(puntos de entrega). Ahora rectifique las inexactas");
+    //alert("Las Direcciones se han validado, ahora rectifique las inexactas")
     //console.log("Returning!!")
     //console.log(arrayAddresses)
 
