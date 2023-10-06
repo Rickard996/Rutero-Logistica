@@ -13,13 +13,15 @@
 <body>
     <h1>Rutero logistica</h1>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <!-- Here the general div where the elements display -->
     <div class="container">
+      <!-- container of the map-->
       <div id="map" class="map_container"></div>
       <!--
      <input type="text" id="address">
      <input type="submit" id="submit">
       -->
-    <!-- Here the textArea where the excel format goes-->
+      <!-- Container of excel textArea, tables and buttons  -->
       <div class="excel_container">
         <textarea id="myDemoTextArea"></textarea>
         <div>
@@ -27,12 +29,12 @@
         </div>
         <div id="table_container" hidden></div>
         <textarea id="tableAsJSON" hidden></textarea>
-        <button type="submit" id="validate">Validar Direcciones</button>
-        <button type="submit" id="rectify">Rectificar Direcciones</button>
-        <button type="submit" id="searchFinal">Posicionar en mapa</button>
+        <button type="submit" id="validate" class="btn btn-info">Validar Direcciones</button>
+        <button type="submit" id="rectify" class="btn btn-info">Rectificar Direcciones</button>
+        <button type="submit" id="searchFinal" class="btn btn-info">Posicionar en mapa</button>
         <!-- Table of data-->
         <div id="table_container">
-        <table id="myTable" class="table table-borderless table-striped table-earning text-center tableFixHead">
+        <table id="myTable" class="table table-success table-borderless table-striped table-earning text-center tableFixHead">
           <thead>
             <tr>
               <th scope="col">Cliente</th>
@@ -46,7 +48,7 @@
         </div>
 
         <div id="table_container">
-        <table id="tableToExport" class="table table-borderless table-striped table-earning text-center tableFixHead" hidden>
+        <table id="tableToExport" class="table table-success table-borderless table-striped table-earning text-center tableFixHead" hidden>
           <thead>
             <tr>
               <th scope="col">Grupo Ruta asignado</th>
@@ -61,11 +63,11 @@
         </div>
 
         <!-- button assign nro ruta y button exportar asignados -->
-        <button type="submit" id="assign">Asignar ruta</button>
+        <button type="submit" id="assign" class="btn btn-success">Asignar ruta</button>
         <!-- button mostrar array asignadas -->
-        <button type="submit" id="show">Mostrar Asignadas</button>
+        <button type="submit" id="show" class="btn btn-warning">Mostrar Asignadas</button>
         <!-- Button to export html table to excel file -->
-        <button type="submit" id="export">Exportar asignadas</button>
+        <button type="submit" id="export" class="btn btn-danger">Exportar asignadas</button>
       </div>
     </div>
 

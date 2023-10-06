@@ -1,6 +1,12 @@
+body {
+  margin:0 auto; 
+  padding: 0;
+  background-color: #f0efef !important;
+}
+
 #map {
     width: 600px;
-    height: 800px;
+    height: 750px;
     /*
     position: relative; 
     left: 50%;
@@ -14,43 +20,57 @@
 h1 {
     position: relative;
     text-align: center;
+    padding-bottom: 20px;
 }
 
+/* General container. this contains the 2 divs, excel_container and map_container
+*/
 .container {
+  display: flex;
+  align-items: center;
   border: 3px solid #fff;
-  padding: 20px;
+  padding: 5px;
+  max-height: 100vh;
+  overflow: auto;
 }
 
 .excel_container {
-  width: 50%;
-  float: left;
-  padding: 15px;
+  /*width: 100%; */
+  max-height: 100vh; 
+  height: 800px;
+  /*float: left;*/
+  padding: 3px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .map_container {
-  width: 50%;
-  float: left;
-  padding: 20px;
+  width: 100%;
+  /*float: left;*/
+  padding: 10px;
 }
 
 #myDemoTextArea {
-    width: 75%;
-    height: 100px;
+    position: relative;
+    width: 1000px;
+    max-width: 655px;
+    height: 75px;
   }
   
-  #table_container {
+#table_container {
     width: 100%;
+    max-width: 655px;
     max-height: 300px;
     overflow-y: scroll;
     padding: 5px;
   }
   
-  #tableAsJSON {
+#tableAsJSON {
     width: 300px;
     height: 500px;
   }
   
-  table.boostrap4_table_head_dark_striped_rounded_compact {
+table.boostrap4_table_head_dark_striped_rounded_compact {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
@@ -63,7 +83,7 @@ h1 {
     background-color: transparent;
   }
   
-  table.boostrap4_table_head_dark_striped_rounded_compact thead th {
+table.boostrap4_table_head_dark_striped_rounded_compact thead th {
     font-size: 1rem;
     line-height: 1.5;
     border-collapse: collapse;
@@ -77,7 +97,7 @@ h1 {
     border-color: #32383e;
   }
   
-  table.boostrap4_table_head_dark_striped_rounded_compact td {
+table.boostrap4_table_head_dark_striped_rounded_compact td {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;

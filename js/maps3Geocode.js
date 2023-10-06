@@ -289,7 +289,7 @@ async function initMap() {
     })
     //push the grand total element to array (temporal) to see the row in table
     //HAS ONLY KG attribute
-    currentMarker.push({CLIENTE:"Total", Direccion:"-", DESPACHO:"-", KG: sumKG})
+    currentMarker.push({CLIENTE:"Total", Direccion:"-", DESPACHO:"-", KG: sumKG, id:"Total"})
 
     function loadTableData(items) {
       //get the table
@@ -301,6 +301,8 @@ async function initMap() {
       
       items.forEach( item => {
         let row = table.insertRow();   //insert arow of data with values
+        //adding id to the td (called row in this case)
+        row.id = item.id;  //each element (item) has alredy the attribute id
         let cliente = row.insertCell(0);   //column 0
         cliente.innerHTML = item.CLIENTE;
         let direccion = row.insertCell(1); //column 1
@@ -308,7 +310,28 @@ async function initMap() {
         let formatoEntrega = row.insertCell(2); //column 2
         formatoEntrega.innerHTML = item.DESPACHO;
         let totalKG = row.insertCell(3); //column 3
+        totalKG.id = "td" + item.id
         totalKG.innerHTML = item.KG;
+
+        //add a listener for all the tr
+
+        document.getElementById(item.id).addEventListener("click", ()=>{
+          //Removes all child nodes of the set of matched elements from the DOM.
+          console.log("trying to delete item!")
+          $("#"+item.id).empty();
+          //Descontar del total de KG in the table
+          sumKG = sumKG - item.KG;
+          $('#tdTotal').html(sumKG);
+          //now remove the element with the same id from the currentMarker array
+          //first find the index of the element, then delete the object in that position
+          const indexToDelete = currentMarker.indexOf(item);
+          if (indexToDelete > -1) { // only splice array when item is found
+            currentMarker.splice(indexToDelete, 1); // 2nd parameter means remove one item only
+          }
+          console.log("Removing item from array!");
+      })
+
+
       });
     }
     loadTableData(currentMarker);
