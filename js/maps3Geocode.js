@@ -383,7 +383,7 @@ function geocodePlaceAll(geocoder, map){
                 position: results[0].geometry.location,
                 //img name
                 
-                icon: '../img/darkgreen_MarkerC.png',
+                icon: './img/darkgreen_MarkerC.png',
                 id: element.id,
                 /*
                 label: {
@@ -399,7 +399,7 @@ function geocodePlaceAll(geocoder, map){
                 map,
                 position: results[0].geometry.location,
                 //img name
-                icon: '../img/orange_MarkerV.png',
+                icon: './img/orange_MarkerV.png',
                 id: element.id,
                 /*
                 label: {
