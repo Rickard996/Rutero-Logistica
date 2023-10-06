@@ -382,8 +382,8 @@ function geocodePlaceAll(geocoder, map){
                 map,
                 position: results[0].geometry.location,
                 //img name
-                
-                icon: './img/darkgreen_MarkerC.png',
+                //icon: '../img/orange_MarkerV.png',
+                icon: 'https://github.com/Rickard996/Rutero-Logistica/tree/master/img/darkgreen_MarkerC.png',
                 id: element.id,
                 /*
                 label: {
@@ -399,7 +399,7 @@ function geocodePlaceAll(geocoder, map){
                 map,
                 position: results[0].geometry.location,
                 //img name
-                icon: './img/orange_MarkerV.png',
+                icon: 'https://github.com/Rickard996/Rutero-Logistica/tree/master/img/orange_MarkerV.png',
                 id: element.id,
                 /*
                 label: {
