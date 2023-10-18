@@ -189,6 +189,8 @@ async function initMap() {
     console.log(addressArray)
     console.log("Antes de añadir isExact")
     console.log(arrayAddresses)
+    //arrayAddresses contiene o deberia contener elementos unicos
+
     //este array ya existe
     addressArray.forEach((element, ind)=>{
         //modifica el elemento en su propiedad Direccion, añadiendo ,Valdivia
@@ -198,8 +200,20 @@ async function initMap() {
         element.isExact = false
         //ahora agrega a cada elemento un nuevo feature, que es un id que servira mas adelante
         element.id = ind;
-        //ahora si añade el element al array
-        arrayAddresses.push(element)
+        //ahora si añade el element al array. pero antes verifica que no haya cliente o direccion duplicada
+
+        //The find() method of Array instances returns the first element in the provided array that satisfies the provided testing function.
+        //If the element match the get me the value
+        let found = arrayAddresses.find((el) => (el.CLIENTE === element.CLIENTE) || (el.Direccion === element.Direccion));
+        if (typeof found == 'undefined'){    //if undefined the this is unique value and must be added as individual
+          arrayAddresses.push(element)
+        }else{ //if not undefined, then CLENTE is repeated
+          if (found.DESPACHO != element.DESPACHO){     //Si el tipo de despacho es distinto entonces hacer VARA/CAJA al element existente
+            found.DESPACHO = "VARA Y CAJA"
+            found.KG = parseFloat(found.KG) + parseFloat(element.KG)      //suma las cantidades
+          } //En caso contrario se queda como VARA o CAJA
+        }
+        //arrayAddresses.push(element)
     })
     arrayAddresses.pop();  //delete last element(empty element)
 
@@ -310,7 +324,7 @@ async function initMap() {
         let formatoEntrega = row.insertCell(2); //column 2
         formatoEntrega.innerHTML = item.DESPACHO;
         let totalKG = row.insertCell(3); //column 3
-        totalKG.id = "td" + item.id
+        totalKG.id = "td" + item.id;
         totalKG.innerHTML = item.KG;
 
         //add a listener for all the tr
@@ -480,11 +494,13 @@ function assignNewRuta(){
         console.log(el);
         assignCloned(el, nroRuta);
 
-      //Clear the markers already assigned
+      //Clear the markers already assigned or change the marker icon to identify already assigned
       //set clickable and visible attributes to false
       arrayMarkers.forEach((marker, index)=>{
         if(marker.id == el.id){  //if the ids match
-          marker.setMap(null);
+          //change the icon of the marker. Esto indicara que ya esta asignado (A)
+          marker.setIcon("https://Rickard996.github.io/Rutero-Logistica/img/paleblue_MarkerA.png");
+          //marker.setMap(null);
         }
       })
     })
